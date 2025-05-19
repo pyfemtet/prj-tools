@@ -1,4 +1,4 @@
 _impl/secret.yaml
 */__pycache__
-*/.vscode
-*/.idea
+.vscode
+.idea
