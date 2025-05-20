@@ -79,7 +79,6 @@ if __name__ == '__main__':
         marks_str = ' and '.join(marks)
         options += f' -m "{marks_str}"'
 
-
     # --progress-path
     without_ext: str = datetime.datetime.now().strftime(
         test_result_yaml_timestamp_format + test_result_yaml_filename_suffix
