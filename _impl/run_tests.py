@@ -105,6 +105,9 @@ if __name__ == '__main__':
         options += f' "{path}"'
         path = str(project_root / 'tests/femprj_sample_tests')
         options += f' "{path}"'
+    if manual_only:
+        path = str(project_root / 'tests/manual_test')
+        options += f' "{path}"'
 
     # run pytest
     # ----------
