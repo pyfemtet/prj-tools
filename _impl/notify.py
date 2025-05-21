@@ -1,5 +1,8 @@
+import os
 import sys
 import smtplib
+from email import encoders
+from email.mime.base import MIMEBase
 from email.mime.text import MIMEText
 from email.mime.multipart import MIMEMultipart
 
@@ -19,7 +22,7 @@ smtp_port = secret['SMTP_PORT']
 # 送信者のメールアドレスとパスワード
 sender_email = secret['NOTIFICATION_FROM']
 
-def send_mail(subject: str, body: str):
+def send_mail(subject: str, body: str, html_file_path: str = None):
 
     body = body.replace('\\n', '\n')
 
@@ -49,6 +52,18 @@ def send_mail(subject: str, body: str):
     msg['From'] = sender_email
     msg['To'] = receiver_email
     msg['Subject'] = subject
+
+    # report html の添付
+    if html_file_path is not None:
+        if os.path.isfile(html_file_path):
+            with open(html_file_path, 'rb') as f:
+                mime_base = MIMEBase('text', 'html')
+                mime_base.set_payload(f.read())
+                encoders.encode_base64(mime_base)
+                mime_base.add_header('Content-Disposition', f'attachment; filename="{html_file_path.split("/")[-1]}"')
+                msg.attach(mime_base)
+        else:
+            body = '添付すべき html ファイルが見つかりませんでした。\n\n' + body
 
     # 本文をメールに添付
     msg.attach(MIMEText(body, 'plain'))

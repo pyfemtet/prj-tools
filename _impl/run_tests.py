@@ -90,8 +90,10 @@ if __name__ == '__main__':
     options += f' --junit-xml="{without_ext}.xml"'
 
     # --report (pytest-reporter-html-dots)
-    options += (f' --report="{without_ext}.html"'
+    report_path = f'{without_ext}.html'
+    options += (f' --report="{report_path}"'
                 f' --template="html-dots/index.html"')
+
 
     # file_or_dir (final)
     if mode == 'module':
@@ -161,7 +163,7 @@ if __name__ == '__main__':
         else:
             symbol = '❔'
         body += f'{symbol}: {name}\n'
-    send_mail(subject, body)
+    send_mail(subject, body, report_path)
 
     # return_code
     if all_test_passed:
