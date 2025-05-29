@@ -40,7 +40,7 @@ if NOT "%current_branch%"=="main" (
 )
 
 REM release ブランチに切り替え
-git checkout release-1
+git checkout release-1.x
 if errorlevel 1 (
     echo === Failed to checkout release branch. ===
     GOTO :ERROR
