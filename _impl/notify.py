@@ -31,15 +31,36 @@ def send_mail(subject: str, body: str, html_file_path: str = None):
     try:
         print(subject)
     except UnicodeEncodeError:
-        print(subject.encode('cp932', 'ignore').decode('cp932'))
+        # print(subject.encode('cp932', 'ignore').decode('cp932'))
+        print(
+            body.replace(
+                '✅', '[P]'
+            ).replace(
+                '🔥', '[F]'
+            ).replace(
+                '💤', '[S]'
+            ).replace(
+                '❔', '[?]'
+            )
+        )
     print()
     print('<body>')
     try:
         print(body)
     except UnicodeEncodeError:
-        print(body.encode('cp932', 'ignore').decode('cp932'))
+        # print(body.encode('cp932', 'ignore').decode('cp932'))
+        print(
+            body.replace(
+                '✅', '[P]'
+            ).replace(
+                '🔥', '[F]'
+            ).replace(
+                '💤', '[S]'
+            ).replace(
+                '❔', '[?]'
+            )
+        )
     print()
-
 
     # 受信者のメールアドレス
     receiver_email = ';'.join(secret['NOTIFICATION_TO'])

@@ -146,27 +146,34 @@ if __name__ == '__main__':
         sys.exit(1)
 
     # summarize
-    passed_list = [None for _ in all_names]
-    for i, result in enumerate(data.get('results', []) or []):
-        # noinspection PyTypeChecker
-        passed_list[i] = result.get('call', None) == 'passed'
-    all_test_passed = all([passed or False for passed in passed_list])
+    out_results: dict = {name: 'unknown' for name in all_names}  # name: passed / skipped / failed / unknown
+    results = data.get('results', {}) or {}
+    out_results.update(results)
+    assert len(out_results) == len(all_names)
+
+    # check entire result
+    is_entire_passed = True
+    for name, result in out_results.items():
+        if result == 'failed' or result == 'unknown':
+            is_entire_passed = False
 
     # send mail
-    subject = f'({"✅PASSED" if all_test_passed else "🔥FAILED"}) PyFemtet Test Result'
+    subject = f'({"✅PASSED" if is_entire_passed else "🔥FAILED"}) PyFemtet Test Result'
     body = ''
-    for name, passed in zip(all_names, passed_list):
-        if passed is True:
+    for name, result in out_results.items():
+        if result == 'passed':
             symbol = '✅'
-        elif passed is False:
+        elif result == 'failed':
             symbol = '🔥'
+        elif result == 'skipped':
+            symbol = '💤'
         else:
             symbol = '❔'
         body += f'{symbol}: {name}\n'
     send_mail(subject, body, report_path)
 
     # return_code
-    if all_test_passed:
+    if is_entire_passed:
         return_code = 0
     else:
         return_code = 1
