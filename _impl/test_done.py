@@ -75,11 +75,11 @@ def check_yamls(yaml_paths_):
 
         # summarize
         done_test_names = data.get('items', []) or []
-        done_results = data.get('results', []) or []
+        done_results = data.get('results', {}) or {}
 
-        for done_name, done_result in zip(done_test_names, done_results):
-            result: str = done_result.get('call', 'failed') or 'failed'
-            results[done_name] = True if result == 'passed' else False
+        for done_name, done_result in done_results.items():
+            result: str = done_result
+            results[done_name] = True if result in ('passed', 'skipped') else False
 
     # get all test names from pytest command
     cmd = [sys.executable, '-m', 'pytest', '--collect-only', '-q']
@@ -88,9 +88,16 @@ def check_yamls(yaml_paths_):
 
     # pytest の出力結果からテスト名を取得
     # 例: pytest の --collect-only -q はテスト名を1行ずつ表示するので
-    all_test_names = [l.strip().split('::')[-1]
+    _all_test_names = [l.strip().split('::')[-1]
                       for l in comp_proc.stdout.splitlines()
                       if l.strip()][:-1]
+    
+    # warning などの summary 以降を削除
+    all_test_names = []
+    for name in _all_test_names:
+        if name.startswith('==='):
+            break
+        all_test_names.append(name)
 
     # check
     all_results = {name: results.get(name, False) for name in all_test_names}
