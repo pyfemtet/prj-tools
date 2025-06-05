@@ -66,7 +66,7 @@ def collect_yaml_paths(test_start_):
 def check_yamls(yaml_paths_):
 
     # collect results of done tests
-    results: dict[str, bool] = dict()
+    results: dict[str, str] = dict()
     for yaml_path in yaml_paths_:
 
         # load
@@ -79,7 +79,7 @@ def check_yamls(yaml_paths_):
 
         for done_name, done_result in done_results.items():
             result: str = done_result
-            results[done_name] = True if result in ('passed', 'skipped') else False
+            results[done_name] = result
 
     # get all test names from pytest command
     cmd = [sys.executable, '-m', 'pytest', '--collect-only', '-q']
@@ -100,8 +100,8 @@ def check_yamls(yaml_paths_):
         all_test_names.append(name)
 
     # check
-    all_results = {name: results.get(name, False) for name in all_test_names}
-    out = all(all_results.values())
+    all_results = {name: results.get(name, 'not yet') for name in all_test_names}
+    out = all([r in ('passed', 'skipped') for r in all_results.values()])
 
     print('All test names:', all_test_names)
     print('Done results:', results)
