@@ -1,4 +1,17 @@
+"""
+
+Args:
+    args[0]: The suffix of the tag
+    args[1]: Choice the Nth from latest version
+
+Usage:
+    .\tools\_impl\create_tag.py
+    .\tools\_impl\create_tag.py rc 1
+
+"""
+
 import re
+import sys
 import subprocess
 from packaging.version import Version
 
@@ -8,6 +21,20 @@ def run_git_command(cmd: list[str]) -> str:
 
 
 if __name__ == '__main__':
+
+    # option の初期値
+    additional = ''
+    choice = -1
+
+    # suffix
+    if len(sys.argv) >= 2:
+        additional = sys.argv[1]  # 'a', 'b' or 'rc'
+
+    # 最新の N 個前
+    if len(sys.argv) >= 3:
+        # -1 が最新なので
+        choice = -1 - int(sys.argv[2])
+
     # git からタグを取得
     output = run_git_command(['git', 'tag'])
     tag_names = output.splitlines()
@@ -21,8 +48,8 @@ if __name__ == '__main__':
     if not version_tags:
         raise RuntimeError('有効なタグが見つかりませんでした')
 
-    # 最新のタグを取得
-    last_tag = sorted(version_tags, key=Version)[-1]
+    # Nth タグを取得
+    last_tag = sorted(version_tags, key=Version)[choice]
 
     # 'a' 'b' 'alpha' 'beta' 'rc' で終わっていればそれを取る
     new_tag: str
@@ -35,7 +62,7 @@ if __name__ == '__main__':
     else:
         major, minor, patch = last_tag[1:].split('.')
         new_patch = int(patch) + 1
-        new_tag = f'v{major}.{minor}.{str(new_patch)}'
+        new_tag = f'v{major}.{minor}.{str(new_patch)}{additional}'
 
     # git でタグをつける
     run_git_command(['git', 'tag', new_tag])

@@ -39,6 +39,9 @@ if NOT "%current_branch%"=="main" (
     GOTO :ERROR
 )
 
+REM main に rc 版タグを生成、付与
+uv run --no-sync python .\tools\_impl\create_tag.py rc
+
 REM release ブランチに切り替え
 git checkout release-1.x
 if errorlevel 1 (
@@ -54,7 +57,7 @@ if errorlevel 1 (
 )
 
 REM タグを生成、付与
-uv run python .\tools\_impl\create_tag.py
+uv run --no-sync python .\tools\_impl\create_tag.py
 
 REM 切り戻し
 git checkout %current_branch%
